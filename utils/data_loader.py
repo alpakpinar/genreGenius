@@ -21,7 +21,7 @@ class DataLoader:
 
         Returns a dictionary which maps (artist, song_name, ID)
         to the lyrics (list of words).'''
-        self.data = {}
+        self.dict = {}
         self.artists = list(self.df['artist'])
         self.song_names = list(self.df['song'])
         self.ids = self._id()
@@ -35,11 +35,25 @@ class DataLoader:
             processed_lyrics = simple_preprocess(lyric)
 
             # Fill the dictionary
-            self.data[(self.artists[idx], self.song_names[idx], self.ids[idx])] = processed_lyrics
+            self.dict[(self.artists[idx], self.song_names[idx], self.ids[idx])] = processed_lyrics
 
         print('Pre-processing complete!')
-        return self.data
+        return self.dict
 
+    def _aggregate(self, data):
+        '''Aggregate the lyrics into a 2D array.'''
+        # Initialize the 2D list
+        word_list_2d = []
+        for word_list in list(data.values()):
+            word_list_2d.append(word_list)
+        
+        return word_list_2d
+    
     def get_data(self):
-        '''Get the dictionary containing (artist, songname, ID) --> lyrics'''
-        return self._preprocess()
+        '''Get a tuple containing: 
+        Dictionary that maps (artist, songname, ID) --> lyrics
+        2D set of lyrics as list of words.
+        '''
+        self.dict = self._preprocess()
+        self.word_list_2d = self._aggregate(self.dict)
+        return (self.dict, self.word_list_2d)
