@@ -119,8 +119,6 @@ class DataProcessor:
         print('Done')
         print('*'*20)
 
-        return (self.dict, self.word_list_2d)
-
     def dump_to_pkl(self):
         '''Vectorize the pre-processed lyrics and dump the data for each song
            to output .pkl files. 
