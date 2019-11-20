@@ -49,6 +49,25 @@ class DataProcessor:
         print('Pre-processing complete!')
         return self.dict
 
+    def _save_labels_to_pkl(self, data_dict):
+        '''Save artist, song name pairs to an output .pkl file.'''
+        labels = list(data_dict.keys())
+        drop_id = lambda key : key[:-1] # Don't save the ID 
+
+        labels_clean = list(map(drop_id, labels))
+
+        # Turn it into 2D numpy array
+        labels_clean = np.array(labels_clean)
+
+        # Save the labels to pkl file
+        out_file = './pkl_dir/labels.pkl'
+        print('*'*20)
+        print('Saving labels into {}'.format(out_file))
+        with open(out_file, 'wb+') as f:
+            np.save(f, labels_clean)
+
+        print('Saved labels into {}'.format(out_file))
+
     def _aggregate(self, data):
         '''Aggregate the lyrics into a 2D array.'''
         # Initialize the 2D list
