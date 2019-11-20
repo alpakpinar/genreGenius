@@ -68,15 +68,57 @@ class DataProcessor:
 
         print('Saved labels into {}'.format(out_file))
 
-    def _aggregate(self, data):
-        '''Aggregate the lyrics into a 2D array.'''
-        # Initialize the 2D list
-        word_list_2d = []
-        for word_list in list(data.values()):
-            word_list_2d.append(word_list)
-        
-        return word_list_2d
-    
+    def _vectorize_song(self, song, model):
+        '''Using the model provided, get the resultant vector for the given song.'''
+        # Initialize array of zeros
+        vector = np.zeros(300) # Update this do not hardcode
+
+        # Get the vectprs for words and sum them up
+        for word in song:
+            try:
+                vector += model[f'{word}']
+            except:
+                continue
+
+        # Normalize
+        vector = vector / np.linalg.norm(vector)
+        return vector
+
+    def _vectorize(self, data):
+        '''Given the data dictionary, get the vectors corresponding to each song
+           and save them into a pickle file.'''
+        # Load the model 
+        print('*'*20)
+        print('Downloading Word2Vec model')
+        model_file = './google_word2vec/GoogleNews-vectors-negative300.bin'
+        model = KeyedVectors.load_word2vec_format(model_file, binary=True)
+        print('Word2Vec model loaded!')
+        print('*'*20)
+
+        # Vectorize the songs
+        self.vectors = []
+        song_list = list(data.values())
+        for idx, song in enumerate(song_list):
+            print('Vectorizing: {}/{}'.format(idx, self.num_songs), end='\r')
+            song_vector = self._vectorize_song(song, model)
+            self.vectors.append(song_vector)
+
+        # Convert into 2D numpy array
+        self.vectors = np.array(self.vectors)
+        print('Vectorizing: {}/{}'.format(self.num_songs, self.num_songs))
+        print('Vectorizing complete!')
+
+        # Save to pickle file
+        out_file = './pkl_dir/vectors.pkl'
+        print('Saving vectors into {}'.format(out_file))
+
+        with open(out_file, 'wb+') as f:
+            np.save(f, self.vectors)
+
+        print('Saved vectors into {}'.format(out_file))
+        print('Done')
+        print('*'*20)
+
     def get_data(self):
         '''Get a tuple containing: 
         Dictionary that maps (artist, songname, ID) --> lyrics
