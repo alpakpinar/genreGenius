@@ -1,12 +1,19 @@
-from gensim.utils import simple_preprocess
+import numpy as np
 import pandas as pd
+import os
+from gensim.utils import simple_preprocess
+from gensim.models import KeyedVectors
 
-class DataLoader:
-    '''Class for loading and preprocessing lyrics from an input csv file.'''
+class DataProcessor:
+    '''Class for loading and preprocessing lyrics from an input csv file.
+       Feed the words into Google Word2Vec algorithm to vectorize.
+       Save the vectors to output pickle file.'''
     def __init__(self, input_file='songdata.csv'):
         self.df = pd.read_csv(input_file)
         self.num_songs = self.df.shape[0]
         print('{} songs loaded!'.format(self.num_songs))
+        out_dir = './pkl_dir'
+        if not os.path.exists(out_dir): os.mkdir(out_dir)
 
     def _id(self):
         '''Create unique ID for each song using the link in the data.'''
@@ -28,7 +35,8 @@ class DataLoader:
         self.lyrics = self.df['text']
 
         for idx, lyric in enumerate(self.lyrics):
-            if idx % 5000 == 0: print('Processing lyrics: {}'.format(idx))
+            print('Processing lyrics: {}/{}'.format(idx, self.num_songs), end='\r')
+
             # Feed each string into the cool gensim preprocessor:
             # https://radimrehurek.com/gensim/utils.html#gensim.utils.simple_preprocess
 
@@ -37,6 +45,7 @@ class DataLoader:
             # Fill the dictionary
             self.dict[(self.artists[idx], self.song_names[idx], self.ids[idx])] = processed_lyrics
 
+        print('Processing lyrics: {}/{}'.format(self.num_songs, self.num_songs))
         print('Pre-processing complete!')
         return self.dict
 
