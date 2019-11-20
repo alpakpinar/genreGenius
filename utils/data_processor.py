@@ -119,11 +119,13 @@ class DataProcessor:
         print('Done')
         print('*'*20)
 
-    def get_data(self):
-        '''Get a tuple containing: 
-        Dictionary that maps (artist, songname, ID) --> lyrics
-        2D set of lyrics as list of words.
+        return (self.dict, self.word_list_2d)
+
+    def dump_to_pkl(self):
+        '''Vectorize the pre-processed lyrics and dump the data for each song
+           to output .pkl files. 
         '''
         self.dict = self._preprocess()
-        self.word_list_2d = self._aggregate(self.dict)
-        return (self.dict, self.word_list_2d)
+        self._save_labels_to_pkl(self.dict)
+        self._vectorize(self.dict)
+                                      
