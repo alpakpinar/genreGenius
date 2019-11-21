@@ -7,12 +7,12 @@ from gensim.models import KeyedVectors
 class DataProcessor:
     '''Class for loading and preprocessing lyrics from an input csv file.
        Feed the words into Google Word2Vec algorithm to vectorize.
-       Save the vectors to output pickle file.'''
+       Save the vectors to output npy file.'''
     def __init__(self, input_file='songdata.csv'):
         self.df = pd.read_csv(input_file)
         self.num_songs = self.df.shape[0]
         print('{} songs loaded!'.format(self.num_songs))
-        out_dir = './pkl_dir'
+        out_dir = './npy_dir'
         if not os.path.exists(out_dir): os.mkdir(out_dir)
 
     def _id(self):
@@ -49,8 +49,8 @@ class DataProcessor:
         print('Pre-processing complete!')
         return self.dict
 
-    def _save_labels_to_pkl(self, data_dict):
-        '''Save artist, song name pairs to an output .pkl file.'''
+    def _save_labels_to_npy(self, data_dict):
+        '''Save artist, song name pairs to an output .npy file.'''
         labels = list(data_dict.keys())
         drop_id = lambda key : key[:-1] # Don't save the ID 
 
@@ -59,8 +59,8 @@ class DataProcessor:
         # Turn it into 2D numpy array
         labels_clean = np.array(labels_clean)
 
-        # Save the labels to pkl file
-        out_file = './pkl_dir/labels.pkl'
+        # Save the labels to npy file
+        out_file = './npy_dir/labels.npy'
         print('*'*20)
         print('Saving labels into {}'.format(out_file))
         with open(out_file, 'wb+') as f:
@@ -86,7 +86,7 @@ class DataProcessor:
 
     def _vectorize(self, data):
         '''Given the data dictionary, get the vectors corresponding to each song
-           and save them into a pickle file.'''
+           and save them into a npy file.'''
         # Load the model 
         print('*'*20)
         print('Downloading Word2Vec model')
@@ -108,8 +108,8 @@ class DataProcessor:
         print('Vectorizing: {}/{}'.format(self.num_songs, self.num_songs))
         print('Vectorizing complete!')
 
-        # Save to pickle file
-        out_file = './pkl_dir/vectors.pkl'
+        # Save to npy file
+        out_file = './npy_dir/vectors.npy'
         print('Saving vectors into {}'.format(out_file))
 
         with open(out_file, 'wb+') as f:
@@ -119,11 +119,11 @@ class DataProcessor:
         print('Done')
         print('*'*20)
 
-    def dump_to_pkl(self):
+    def dump_to_npy(self):
         '''Vectorize the pre-processed lyrics and dump the data for each song
-           to output .pkl files. 
+           to output .npy files. 
         '''
         self.dict = self._preprocess()
-        self._save_labels_to_pkl(self.dict)
+        self._save_labels_to_npy(self.dict)
         self._vectorize(self.dict)
                                       
