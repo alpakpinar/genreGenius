@@ -1,0 +1,19 @@
+name: genreGenius
+channels:
+  - defaults
+  - conda-forge
+dependencies:
+  - numpy
+  - scipy
+  - pandas
+  - numba
+  - gensim
+  - matplotlib
+  - seaborn
+  - plotly
+  - scikit-learn
+  - jupyter
+  - nb_conda
+  - pip
+  - pip:
+    - umap-learn
