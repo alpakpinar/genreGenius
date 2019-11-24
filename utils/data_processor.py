@@ -40,7 +40,7 @@ class DataProcessor:
         for idx, lyric in enumerate(self.lyrics):
             print('Processing lyrics: {}/{}'.format(idx, self.num_songs), end='\r')
             
-			# Remove specified words
+            # Remove specified words
             remove_str = '|'.join(remove_words)
             remove_regex = re.compile(remove_str) 
             lyrics_new = re.sub(remove_regex, '', lyric)
