@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import os
+import re
 from gensim.utils import simple_preprocess
 from gensim.models import KeyedVectors
 
@@ -23,7 +24,7 @@ class DataProcessor:
         self.ids = list(map(create_id, self.links))
         return self.ids
 
-    def _preprocess(self):
+    def _preprocess(self, remove_words=['and', 'the']):
         '''Pre-process the lyrics. Create a unique ID for each song using the link in the data.
 
         Returns a dictionary which maps (artist, song_name, ID)
@@ -41,6 +42,11 @@ class DataProcessor:
             # https://radimrehurek.com/gensim/utils.html#gensim.utils.simple_preprocess
 
             processed_lyrics = simple_preprocess(lyric)
+
+            # Remove additional specified words
+            remove_str = '|'.join(remove_words)
+            remove_regex = re.compile(remove_str) 
+            processed_lyrics = re.sub(remove_regex, '', lyric)
 
             # Fill the dictionary
             self.dict[(self.artists[idx], self.song_names[idx], self.ids[idx])] = processed_lyrics
