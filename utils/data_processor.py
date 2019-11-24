@@ -39,16 +39,16 @@ class DataProcessor:
 
         for idx, lyric in enumerate(self.lyrics):
             print('Processing lyrics: {}/{}'.format(idx, self.num_songs), end='\r')
+            
+			# Remove specified words
+            remove_str = '|'.join(remove_words)
+            remove_regex = re.compile(remove_str) 
+            lyrics_new = re.sub(remove_regex, '', lyric)
 
             # Feed each string into the cool gensim preprocessor:
             # https://radimrehurek.com/gensim/utils.html#gensim.utils.simple_preprocess
 
-            processed_lyrics = simple_preprocess(lyric)
-
-            # Remove additional specified words
-            remove_str = '|'.join(remove_words)
-            remove_regex = re.compile(remove_str) 
-            processed_lyrics = re.sub(remove_regex, '', lyric)
+            processed_lyrics = simple_preprocess(lyrics_new)
 
             # Fill the dictionary
             self.dict[(self.artists[idx], self.song_names[idx], self.ids[idx])] = processed_lyrics
