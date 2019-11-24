@@ -11,6 +11,8 @@ class DataProcessor:
        Save the vectors to output npy file.'''
     def __init__(self, input_file='songdata.csv'):
         self.df = pd.read_csv(input_file)
+        # Drop cover songs
+        self.df = self.df.drop_duplicates('song')
         self.num_songs = self.df.shape[0]
         print('{} songs loaded!'.format(self.num_songs))
         out_dir = './npy_dir'
