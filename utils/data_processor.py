@@ -158,18 +158,27 @@ class DataProcessor:
         '''Delete the most common (num_words) words from the lyrics.'''
         common_words, counts = self.get_common_words(word_counter, num_words)
 
+        print('*'*20)
+        print('Number of most common words to be cleaned: {}'.format(num_words))
+
         # Update the lyrics
-        for dict_key in data_dict.keys():
-            dict_key = tuple(dict_key) 
+        for idx, dict_key in enumerate(data_dict.keys()):
+            print('Cleaning common words: {}/{}'.format(idx,self.num_songs), end='\r')
             data_dict[dict_key] = list(filter(lambda word: word not in common_words, data_dict[dict_key]))
+        
+        print('Cleaning common words: {}/{}'.format(self.num_songs,self.num_songs))
 
         return data_dict
 
-    def dump_to_npy(self):
+    def dump_to_npy(self, num_common_words=None):
         '''Vectorize the pre-processed lyrics and dump the data for each song
-           to output .npy files. 
+           to output .npy files. Remove specified number of most common words if specified. 
         '''
         self.dict, word_counter = self._preprocess()
+
+        if num_common_words:
+            self.dict = self.clean_common_words(self.dict, word_counter, num_common_words)
+
         self._save_labels_to_npy(self.dict)
         self._vectorize(self.dict)
                                       
