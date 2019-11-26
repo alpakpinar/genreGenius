@@ -4,6 +4,7 @@ import os
 import re
 from gensim.utils import simple_preprocess
 from gensim.models import KeyedVectors
+from nltk.corpus import stopwords
 
 class DataProcessor:
     '''Class for loading and preprocessing lyrics from an input csv file.
@@ -26,8 +27,9 @@ class DataProcessor:
         self.ids = list(map(create_id, self.links))
         return self.ids
 
-    def _preprocess(self, remove_words=['and', 'the']):
+    def _preprocess(self):
         '''Pre-process the lyrics. Create a unique ID for each song using the link in the data.
+        Remove NLTK's stopwords from the lyrics.
 
         Returns a dictionary which maps (artist, song_name, ID)
         to the lyrics (list of words).'''
@@ -40,15 +42,14 @@ class DataProcessor:
         for idx, lyric in enumerate(self.lyrics):
             print('Processing lyrics: {}/{}'.format(idx, self.num_songs), end='\r')
             
-            # Remove specified words
-            remove_str = '|'.join(remove_words)
-            remove_regex = re.compile(remove_str) 
-            lyrics_new = re.sub(remove_regex, '', lyric)
-
             # Feed each string into the cool gensim preprocessor:
             # https://radimrehurek.com/gensim/utils.html#gensim.utils.simple_preprocess
 
-            processed_lyrics = simple_preprocess(lyrics_new)
+            processed_lyrics = simple_preprocess(lyric)
+
+            # Remove the stopwords
+            sw = stopwords.words('english')
+            processed_lyrics = list(filter(lambda word: word not in sw, processed_lyrics))
 
             # Fill the dictionary
             self.dict[(self.artists[idx], self.song_names[idx], self.ids[idx])] = processed_lyrics
