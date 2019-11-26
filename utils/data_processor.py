@@ -31,14 +31,22 @@ class DataProcessor:
     def _preprocess(self):
         '''Pre-process the lyrics. Create a unique ID for each song using the link in the data.
         Remove NLTK's stopwords from the lyrics.
+        Count the number of occurrence for each word after preprocessing.
 
-        Returns a dictionary which maps (artist, song_name, ID)
-        to the lyrics (list of words).'''
+        Returns two objects:
+        -- A dictionary which maps (artist, song_name, ID)
+        to the lyrics (list of words).
+        -- A Counter object which hold the number of occurrences
+        of each word in the pre-processed lyrics.'''
         self.dict = {}
         self.artists = list(self.df['artist'])
         self.song_names = list(self.df['song'])
         self.ids = self._id()
         self.lyrics = self.df['text']
+
+        self.song_names = list(map(lambda word: word.replace("'", ""), self.song_names))
+
+        word_counter = Counter()
 
         for idx, lyric in enumerate(self.lyrics):
             print('Processing lyrics: {}/{}'.format(idx, self.num_songs), end='\r')
@@ -51,13 +59,16 @@ class DataProcessor:
             # Remove the stopwords
             sw = stopwords.words('english')
             processed_lyrics = list(filter(lambda word: word not in sw, processed_lyrics))
+    
+            # Count the number of words
+            word_counter.update(processed_lyrics)
 
             # Fill the dictionary
             self.dict[(self.artists[idx], self.song_names[idx], self.ids[idx])] = processed_lyrics
 
         print('Processing lyrics: {}/{}'.format(self.num_songs, self.num_songs))
         print('Pre-processing complete!')
-        return self.dict
+        return self.dict, word_counter
 
     def _save_labels_to_npy(self, data_dict):
         '''Save artist, song name pairs to an output .npy file.'''
@@ -129,32 +140,36 @@ class DataProcessor:
         print('Done')
         print('*'*20)
 
-    def get_common_words(self, num_words=100):
+    def get_common_words(self, word_counter, num_words=100):
         '''Get the most common words in the lyrics. Number of common words
            is specified in num_words option, and defaults to 100.  
         '''
-        data_dict = self._preprocess()
-        lyrics = list(data_dict.values())
-        
-        # Initialize an empty counter
-        c = Counter()
-        for lyric in lyrics:
-            c.update(lyric)
-
         take_word = lambda tup : tup[0] # Take the words out of tuples
         take_count = lambda tup : tup[1] # Take the counts out of tuples
 
-        most_common_words_counts = c.most_common(num_words)
+        most_common_words_counts = word_counter.most_common(num_words)
+
         most_common_words = list(map(take_word, most_common_words_counts) )
         most_common_counts = list(map(take_count, most_common_words_counts) )
  
         return most_common_words, most_common_counts
 
+    def clean_common_words(self, data_dict, word_counter, num_words=100):
+        '''Delete the most common (num_words) words from the lyrics.'''
+        common_words, counts = self.get_common_words(word_counter, num_words)
+
+        # Update the lyrics
+        for dict_key in data_dict.keys():
+            dict_key = tuple(dict_key) 
+            data_dict[dict_key] = list(filter(lambda word: word not in common_words, data_dict[dict_key]))
+
+        return data_dict
+
     def dump_to_npy(self):
         '''Vectorize the pre-processed lyrics and dump the data for each song
            to output .npy files. 
         '''
-        self.dict = self._preprocess()
+        self.dict, word_counter = self._preprocess()
         self._save_labels_to_npy(self.dict)
         self._vectorize(self.dict)
                                       
