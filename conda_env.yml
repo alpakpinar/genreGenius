@@ -8,12 +8,12 @@ dependencies:
   - pandas
   - numba
   - gensim
+  - nltk
   - matplotlib
   - seaborn
   - plotly
   - scikit-learn
+  - hdbscan
   - jupyter
   - nb_conda
-  - pip
-  - pip:
-    - umap-learn
+  - umap-learn
