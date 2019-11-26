@@ -5,6 +5,7 @@ import re
 from gensim.utils import simple_preprocess
 from gensim.models import KeyedVectors
 from nltk.corpus import stopwords
+from collections import Counter
 
 class DataProcessor:
     '''Class for loading and preprocessing lyrics from an input csv file.
@@ -127,6 +128,27 @@ class DataProcessor:
         print('Saved vectors into {}'.format(out_file))
         print('Done')
         print('*'*20)
+
+    def get_common_words(self, num_words=100):
+        '''Get the most common words in the lyrics. Number of common words
+           is specified in num_words option, and defaults to 100.  
+        '''
+        data_dict = self._preprocess()
+        lyrics = list(data_dict.values())
+        
+        # Initialize an empty counter
+        c = Counter()
+        for lyric in lyrics:
+            c.update(lyric)
+
+        take_word = lambda tup : tup[0] # Take the words out of tuples
+        take_count = lambda tup : tup[1] # Take the counts out of tuples
+
+        most_common_words_counts = c.most_common(num_words)
+        most_common_words = list(map(take_word, most_common_words_counts) )
+        most_common_counts = list(map(take_count, most_common_words_counts) )
+ 
+        return most_common_words, most_common_counts
 
     def dump_to_npy(self):
         '''Vectorize the pre-processed lyrics and dump the data for each song
