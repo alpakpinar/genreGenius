@@ -22,10 +22,10 @@ conda activate genreGenius
 
 ### Setup NLTK 
 
-In this project, [NLTK](https://www.nltk.org/) library is used to get a list of stopwords to be removed from the song lyrics. To setup NLTK, execute `setup_nltk.sh` file:
+In this project, [NLTK](https://www.nltk.org/) library is used to get a list of stopwords to be removed from the song lyrics. To setup NLTK, source `setup_nltk.sh` file:
 
 ```
-./setup_nltk.sh
+source setup_nltk.sh
 ```
 
 This script will load the stopwords data into the `./nltk_data` directory (if it is not already installed) and set the neccessary environment variable `NLTK_DATA=./nltk_data` so that nltk can access the stopwords stored in this directory.
