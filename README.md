@@ -49,4 +49,13 @@ Once the algorithm is installed, from the genreGenius environment, execute `word
 ```
 ./word2vec.py
 ```
+### Removing Most Common Words
+
+`word2vec.py` can be executed with specifying a number of most common words to be removed from the lyrics, **in addition to** the stop words. To make use of this feature, use `-n` command line argument as follows:
+
+```
+./word2vec.py -n 100
+```
+
+In the example above, the processor will remove the 100 most common words from the lyrics.
 
