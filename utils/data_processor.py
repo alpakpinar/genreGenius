@@ -10,8 +10,16 @@ from collections import Counter
 class DataProcessor:
     '''Class for loading and preprocessing lyrics from an input csv file.
        Feed the words into Google Word2Vec algorithm to vectorize.
-       Save the vectors to output npy file.'''
-    def __init__(self, input_file='songdata.csv'):
+       Save the vectors to output npy file.
+       =================
+       PARAMETERS (__init__)
+       words_to_count : List of words to be counted in each song lyrics.
+       The counts for each words in each song will be stored in a dictionary,
+       mapping the words to arrays containing counts for each song.
+
+       input_file : The csv file containing song data. 
+       '''
+    def __init__(self, words_to_count, input_file='songdata.csv'):
         self.df = pd.read_csv(input_file)
         # Drop cover songs
         self.df = self.df.drop_duplicates('song')
@@ -19,6 +27,12 @@ class DataProcessor:
         print('{} songs loaded!'.format(self.num_songs))
         out_dir = './npy_dir'
         if not os.path.exists(out_dir): os.mkdir(out_dir)
+        
+        # Initialize word counter dictionary and relevant arrays
+        self.count_dict = {}
+        self.words_to_count = words_to_count
+        for word in self.words_to_count:
+            self.count_dict[word] = np.zeros(self.num_songs) 
 
     def _id(self):
         '''Create unique ID for each song using the link in the data.'''
@@ -60,8 +74,12 @@ class DataProcessor:
             sw = stopwords.words('english')
             processed_lyrics = list(filter(lambda word: word not in sw, processed_lyrics))
     
-            # Count the number of words
+            # Update the word counter, counting all words for each song 
             word_counter.update(processed_lyrics)
+
+            # Count the number of specified words
+            for word in self.words_to_count:
+                self.count_dict[word][idx] = processed_lyrics.count(word)
 
             # Fill the dictionary
             self.dict[(self.artists[idx], self.song_names[idx], self.ids[idx])] = processed_lyrics
@@ -88,6 +106,16 @@ class DataProcessor:
             np.save(f, labels_clean)
 
         print('Saved labels into {}'.format(out_file))
+
+    def _save_counts_to_npy(self):
+        '''Save the word counts to an output .npy file.'''
+        out_file = './npy_dir/counts.npy'
+        print('*'*20)
+        print('Saving word counts into {}'.format(out_file))
+        with open(out_file, 'wb+') as f:
+            np.save(f, self.count_dict)
+
+        print('Saved word counts into {}'.format(out_file))
 
     def _vectorize_song(self, song, model):
         '''Using the model provided, get the resultant vector for the given song.'''
@@ -179,6 +207,7 @@ class DataProcessor:
         if num_common_words:
             self.dict = self.clean_common_words(self.dict, word_counter, num_common_words)
 
+        self._save_counts_to_npy()
         self._save_labels_to_npy(self.dict)
         self._vectorize(self.dict)
                                       
