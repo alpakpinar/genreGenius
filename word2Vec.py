@@ -16,9 +16,10 @@ def main():
 
     parser = argparse.ArgumentParser()
     parser.add_argument('-n', '--num_common_words', help='Number of most common words to be removed.', type=int)
+    parser.add_argument('-w', '--words_to_count', help='The list of words to be counted in each song.', nargs='*')
     args = parser.parse_args()
 
-    processor = DataProcessor()
+    processor = DataProcessor(words_to_count=args.words_to_count)
     processor.dump_to_npy(num_common_words = args.num_common_words)
 
 if __name__ == '__main__':
