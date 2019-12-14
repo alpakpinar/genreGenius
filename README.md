@@ -44,18 +44,26 @@ Using Google's Word2Vec algorithm, each song is mapped to a 300-dimensional vect
 
 **NOTE:** Google's Word2Vec algorithm is **not** stored in this Github repository. For DataProcessor to work, make sure that the relevant .bin file is installed and located in the directory `./google_word2vec`. The algorithm can be installed from this [link](https://drive.google.com/file/d/0B7XkCwpI5KDYNlNUTTlSS21pQmM/edit). 
 
-Once the algorithm is installed, from the genreGenius environment, execute `word2vec.py` to get the output .npy files:
+Once the algorithm is installed, from the genreGenius environment, execute `word2vec.py` to get the output .npy files. Note that, in order to carry out the vectorization with word2Vec, `-v` or `--vectorize` flag must be specified:
 
 ```
-./word2vec.py
+./word2vec.py -v
 ```
 ### Removing Most Common Words
 
 `word2vec.py` can be executed with specifying a number of most common words to be removed from the lyrics, **in addition to** the stop words. To make use of this feature, use `-n` command line argument as follows:
 
 ```
-./word2vec.py -n 100
+./word2vec.py -n 100 -v
 ```
 
 In the example above, the processor will remove the 100 most common words from the lyrics.
+
+### Counting Specific Words
+
+`word2vec.py` also supports counting any number of specific words. The counts regarding each of the words will be stored in the file `./npy_dir/counts.npy`. The words for counting can be provided as a command line argument using the option `-w`:
+
+```
+./word2vec.py -w word1 word2 word3
+```
 
