@@ -198,7 +198,7 @@ class DataProcessor:
 
         return data_dict
 
-    def dump_to_npy(self, num_common_words=None):
+    def dump_to_npy(self, num_common_words=None, vectorize=True):
         '''Vectorize the pre-processed lyrics and dump the data for each song
            to output .npy files. Remove specified number of most common words if specified. 
         '''
@@ -209,5 +209,7 @@ class DataProcessor:
 
         self._save_counts_to_npy()
         self._save_labels_to_npy(self.dict)
-        self._vectorize(self.dict)
+
+        if vectorize:
+            self._vectorize(self.dict)
                                       

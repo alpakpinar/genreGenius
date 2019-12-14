@@ -17,10 +17,14 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-n', '--num_common_words', help='Number of most common words to be removed.', type=int)
     parser.add_argument('-w', '--words_to_count', help='The list of words to be counted in each song.', nargs='*')
+    parser.add_argument('-v', '--vectorize', help='Perform the vectorization of each song.', action='store_true')
     args = parser.parse_args()
 
     processor = DataProcessor(words_to_count=args.words_to_count)
-    processor.dump_to_npy(num_common_words = args.num_common_words)
+    processor.dump_to_npy(
+	                      num_common_words=args.num_common_words,
+						  vectorize=args.vectorize
+						  )
 
 if __name__ == '__main__':
     main()
