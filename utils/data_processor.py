@@ -33,8 +33,12 @@ class DataProcessor:
         if self.words_to_count:
             # Initialize word counter dictionary and relevant arrays
             self.count_dict = {}
+            print('*'*20)
+            print('Counting the following words:')
             for word in self.words_to_count:
                 self.count_dict[word] = np.zeros(self.num_songs) 
+                print(word)
+            print('*'*20)
 
     def _id(self):
         '''Create unique ID for each song using the link in the data.'''
