@@ -19,7 +19,7 @@ class DataProcessor:
 
        input_file : The csv file containing song data. 
        '''
-    def __init__(self, words_to_count, input_file='songdata.csv'):
+    def __init__(self, words_to_count=None, input_file='songdata.csv'):
         self.df = pd.read_csv(input_file)
         # Drop cover songs
         self.df = self.df.drop_duplicates('song')
@@ -28,11 +28,13 @@ class DataProcessor:
         out_dir = './npy_dir'
         if not os.path.exists(out_dir): os.mkdir(out_dir)
         
-        # Initialize word counter dictionary and relevant arrays
-        self.count_dict = {}
         self.words_to_count = words_to_count
-        for word in self.words_to_count:
-            self.count_dict[word] = np.zeros(self.num_songs) 
+        
+        if self.words_to_count:
+            # Initialize word counter dictionary and relevant arrays
+            self.count_dict = {}
+            for word in self.words_to_count:
+                self.count_dict[word] = np.zeros(self.num_songs) 
 
     def _id(self):
         '''Create unique ID for each song using the link in the data.'''
@@ -77,9 +79,10 @@ class DataProcessor:
             # Update the word counter, counting all words for each song 
             word_counter.update(processed_lyrics)
 
-            # Count the number of specified words
-            for word in self.words_to_count:
-                self.count_dict[word][idx] = processed_lyrics.count(word)
+            # Count the number of specified words, if specified
+            if self.words_to_count:
+                for word in self.words_to_count:
+                    self.count_dict[word][idx] = processed_lyrics.count(word)
 
             # Fill the dictionary
             self.dict[(self.artists[idx], self.song_names[idx], self.ids[idx])] = processed_lyrics
@@ -207,7 +210,9 @@ class DataProcessor:
         if num_common_words:
             self.dict = self.clean_common_words(self.dict, word_counter, num_common_words)
 
-        self._save_counts_to_npy()
+        if self.words_to_count:
+            self._save_counts_to_npy()
+        
         self._save_labels_to_npy(self.dict)
 
         if vectorize:
